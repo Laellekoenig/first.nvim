@@ -38,6 +38,8 @@ It is also possible to remap the functions `jump_to_next`, `jump_to_prev`,
 }
 ```
 
+If you use `;` or `,` for other purposes, do not use the default keymaps.
+
 ### Customize Keybindings
 ```lua
 vim.keymap.set("n", "f", "<cmd>lua require('first').jump_to_next()<cr>", { noremap = true, silent = true })
