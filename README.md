@@ -19,7 +19,8 @@ The cursor is represented by | |.
  function my_func(my_ty|p|e y) {    Fy              function my_func(my_ty|p|e y) {
 ```
 
-The plugin does not have to be used as a replacement for `f`, `F`, `;` and `,`. \\
+The plugin does not have to be used as a replacement for `f`, `F`, `;` and `,`.
+
 It is also possible to remap the functions `jump_to_next`, `jump_to_prev`, 
 `continue_jump_to_next` and `continue_jump_to_prev` to custom keys.
 
