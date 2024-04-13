@@ -73,7 +73,7 @@ function M.jump_to_prev()
   end
 end
 
-function M.goto_next()
+function M.continue_jump_to_next()
   if vim.fn.line(".") ~= M.last_command.row then
     M.last_command = default_last_command
     return
@@ -96,7 +96,7 @@ function M.goto_next()
   end
 end
 
-function M.goto_prev()
+function M.continue_jump_to_prev()
   if vim.fn.line(".") ~= M.last_command.row then
     M.last_command = default_last_command
     return
@@ -122,11 +122,11 @@ end
 function M.setup(opts)
   opts = opts or {}
 
-  if opts.set_default_keymap then
+  if opts.use_default_keymap then
     vim.keymap.set("n", "f", "<cmd>lua require('first').jump_to_next()<cr>", { noremap = true, silent = true })
     vim.keymap.set("n", "F", "<cmd>lua require('first').jump_to_prev()<cr>", { noremap = true, silent = true })
-    vim.keymap.set("n", ";", "<cmd>lua require('first').goto_next()<cr>", { noremap = true, silent = true })
-    vim.keymap.set("n", ",", "<cmd>lua require('first').goto_prev()<cr>", { noremap = true, silent = true })
+    vim.keymap.set("n", ";", "<cmd>lua require('first').continue_jump_to_next()<cr>", { noremap = true, silent = true })
+    vim.keymap.set("n", ",", "<cmd>lua require('first').continue_jump_to_prev()<cr>", { noremap = true, silent = true })
   end
 end
 
