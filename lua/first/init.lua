@@ -134,7 +134,7 @@ function M.delete_until()
     local target = vim.fn.nr2char(vim.fn.getchar())
     local line = vim.api.nvim_get_current_line()
     local cursor = vim.api.nvim_win_get_cursor(0)
-    local to_delete = get_next_index(line, target, cursor[2])
+    local to_delete = get_next_index(line, target, cursor[2] + 1)
 
     if to_delete == nil then
       return
@@ -149,7 +149,7 @@ function M.delete_until()
     local target = vim.fn.nr2char(vim.fn.getchar())
     local line = vim.api.nvim_get_current_line()
     local cursor = vim.api.nvim_win_get_cursor(0)
-    local to_delete = get_prev_index(line, target, cursor[2])
+    local to_delete = get_prev_index(line, target, cursor[2] - 1)
 
     if to_delete == nil then
       return
