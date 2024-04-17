@@ -35,7 +35,7 @@ It is also possible to remap the functions `jump_to_next`, `jump_to_prev`,
     "Laellekoenig/first.nvim",
     config = function()
         require("first").setup({
-            use_default_keymap = true   --set to false if you do not want to override f, F, ; and ,
+            use_default_keymap = true,  --set to false if you do not want to override f, F, ; and ,
             use_delete_and_change = true,  --create remaps for df, cf, dF and dF
             inclusive_forward_delete = false,  --delete first character of searched word?
             inclusive_backward_delete = true,  --delete first character of searched word?
