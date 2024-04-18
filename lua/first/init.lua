@@ -10,7 +10,12 @@ local default_last_command = {
 M.last_command = default_last_command
 
 local function get_next_index(line, search_char, col_index)
-  local right_line = line:sub(col_index + 1)
+  local adj_index = col_index
+  while adj_index > 1 and line:sub(adj_index, adj_index) ~= " " do
+    adj_index = adj_index - 1
+  end
+
+  local right_line = line:sub(adj_index)
   local offset = #line - #right_line
 
   local index = nil
@@ -22,7 +27,7 @@ local function get_next_index(line, search_char, col_index)
         offset2 = 1
       end
       index = right_line:find(word)
-      if index ~= nil then
+      if index ~= nil and index > col_index then
         return offset + index + offset2
       end
     end
@@ -30,7 +35,12 @@ local function get_next_index(line, search_char, col_index)
 end
 
 local function get_prev_index(line, search_char, col_index)
-  local left_line = line:sub(1, col_index - 1)
+  local adj_index = col_index
+  while adj_index < #line and line:sub(adj_index, adj_index) ~= " " do
+    adj_index = adj_index + 1
+  end
+
+  local left_line = line:sub(1, adj_index)
   local rev_left_line = left_line:reverse()
 
   for rev_word in rev_left_line:gmatch("%w+") do
@@ -41,7 +51,10 @@ local function get_prev_index(line, search_char, col_index)
       local index = rev_left_line:find(rev_word)
       if index ~= nil then
         local end_of_word = index + #rev_word - 1
-        return #left_line - end_of_word + 1
+        local jump_index = #left_line - end_of_word + 1
+        if jump_index < col_index then
+          return jump_index
+        end
       end
     end
   end
