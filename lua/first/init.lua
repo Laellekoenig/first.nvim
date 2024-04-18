@@ -9,54 +9,46 @@ local default_last_command = {
 }
 M.last_command = default_last_command
 
-local function get_next_index(line, search_char, col_index)
-  local adj_index = col_index
-  while adj_index > 1 and line:sub(adj_index, adj_index) ~= " " do
-    adj_index = adj_index - 1
+local function get_word_list(line, filter_fn)
+  local words = {}
+  local search_line = line
+
+  for word in line:gmatch("%w+") do
+    if filter_fn(word) then
+      local index = string.find(search_line, word)
+      if index ~= nil then
+        index = index + #line - #search_line
+        search_line = string.sub(search_line, index + #word, #line)
+        table.insert(words, { word = word, index = index })
+      end
+    end
   end
 
-  local right_line = line:sub(adj_index)
-  local offset = #line - #right_line
+  return words
+end
 
-  local index = nil
-  for word in right_line:gmatch("%w+") do
-    if word:sub(1, 1) == search_char then
-      local offset2 = 0
-      if #word == 1 then
-        word = " " .. word
-        offset2 = 1
-      end
-      index = right_line:find(word)
-      if index ~= nil and index > col_index then
-        return offset + index + offset2
-      end
+local function get_next_index(line, search_char, col_index)
+  local words = get_word_list(line, function(w) return string.sub(w, 1, 1) == search_char end)
+  for _, word in ipairs(words) do
+    if word.index > col_index then
+      return word.index
     end
   end
 end
 
 local function get_prev_index(line, search_char, col_index)
-  local adj_index = col_index
-  while adj_index < #line and line:sub(adj_index, adj_index) ~= " " do
-    adj_index = adj_index + 1
+  local words = get_word_list(line, function(w) return string.sub(w, 1, 1) == search_char end)
+  local found = nil
+  for _, word in ipairs(words) do
+    if word.index >= col_index then
+      break
+    else
+      found = word
+    end
   end
 
-  local left_line = line:sub(1, adj_index)
-  local rev_left_line = left_line:reverse()
-
-  for rev_word in rev_left_line:gmatch("%w+") do
-    if rev_word:sub(#rev_word) == search_char then
-      if #rev_word == 1 then
-        rev_word = " " .. rev_word
-      end
-      local index = rev_left_line:find(rev_word)
-      if index ~= nil then
-        local end_of_word = index + #rev_word - 1
-        local jump_index = #left_line - end_of_word + 1
-        if jump_index < col_index then
-          return jump_index
-        end
-      end
-    end
+  if found ~= nil then
+    return found.index
   end
 end
 
@@ -140,8 +132,8 @@ function M.continue_jump_to_prev()
   end
 end
 
-function M.delete_until()
-  local motion = vim.fn.nr2char(vim.fn.getchar())
+function M.delete_until(m)
+  local motion = m or vim.fn.nr2char(vim.fn.getchar())
 
   if motion == "f" then
     local target = vim.fn.nr2char(vim.fn.getchar())
@@ -196,7 +188,15 @@ function M.delete_until()
 end
 
 function M.change_until()
-  M.delete_until()
+  local motion = vim.fn.nr2char(vim.fn.getchar())
+
+  if motion == "c" then
+    vim.keymap.del("n", "c", {})
+    vim.api.nvim_feedkeys("cc", "nx", true)
+    vim.keymap.set("n", "c", "<cmd>lua require('first').change_until()<cr>", { noremap = true, silent = true })
+  end
+
+  M.delete_until(motion)
   vim.cmd.startinsert()
 end
 
